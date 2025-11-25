@@ -9,10 +9,10 @@ class TicketModel {
     const newTicket = {
       title: ticketData.title,
       description: ticketData.description,
-      userStory: new ObjectId(ticketData.userStoryId),
+      userStory: ticketData.userStoryId,
       status: TICKET_STATUS.ACTIVE,
       comments: ticketData.comments || [],
-      createdBy: new ObjectId(ticketData.userId),
+      createdBy: ticketData.userId,
       createdAt: new Date(),
       updateAt: new Date(),
     };

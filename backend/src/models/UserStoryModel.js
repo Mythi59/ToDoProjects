@@ -10,7 +10,7 @@ class UserStoryModel {
       description: userStoryData.description,
       project: new ObjectId(userStoryData.projectId),
       priority: userStoryData.priority || "medium",
-      createdBy: new ObjectId(userStoryData.userId),
+      createdBy: userStoryData.userId,
       createdAt: new Date(),
     };
 
