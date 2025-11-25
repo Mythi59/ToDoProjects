@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "seed": "node src/helpers/seed.js"
+    "seed": "node src/helpers/seed.js",
+    "start": "node server"
   },
   "keywords": [],
   "author": "",
