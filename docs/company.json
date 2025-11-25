@@ -1,0 +1,58 @@
+{
+  "name": "String",
+  "email": "String (único)",
+  "password": "String (hasheado)",
+  "company": [
+    {
+      "name": "String",
+      "nit": "String / Unique",
+      "phone": "String",
+      "address": "String",
+      "email": "String",
+      "projects": []
+    }
+  ],
+  "role": "String (enum:['user', 'admin'])",
+  "createdAt": "Date"
+}
+
+------
+
+// {
+  "id": "1111",
+  "user": "Juan",
+  "password": "1234",
+  "companys": [
+    {
+      "company1": [
+        {
+          "project1": [
+            {
+              "hu1": [
+                {
+                  "tickets": {
+                    "id": 1,
+                    "description": "aaaaaa",
+                    "status": "activo"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "company2": [],
+      "company3": []
+    }
+  ]
+}
+---------------------------------
+
+{
+  name: String,
+  email: String (único),
+  password: String (hasheado),
+  company: ObjectId, // Referencia a Company
+  role: String (enum: ['user', 'admin']),
+  createdAt: Date
+}
