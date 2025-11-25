@@ -23,8 +23,7 @@ app.use("/tickets", ticketRoutes);
 app.use("/user-stories", userStoryRoutes);
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Welcome to the First Deploy Management API 🍿</h1>`);
-  res.send(`
+  res.send(`<h1>Welcome to the First Deploy Management API 🍿</h1>
       <h3>/company -> Company routes</h3>
       <ul>
         <li>/company -> Get all Companies</li>
@@ -54,7 +53,7 @@ app.get("/", (req, res) => {
         <li>/tickets (POST) -> Create a Ticket</li>
         <li>/tickets/:id (PUT) -> Update a Ticket</li>
       </ul>
-      
+
       <h3>/user-stories -> User Stories routes</h3>
       <ul>
         <li>/user-stories/project/:projectId -> Get User Stories by Project ID</li>
