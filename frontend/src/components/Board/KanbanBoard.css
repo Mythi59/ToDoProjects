@@ -1,0 +1,98 @@
+.kanban-view {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.kanban-container {
+  padding: 2rem 0;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .kanban-board {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.kanban-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+.kanban-column-header {
+  background: white;
+  border-radius: 8px 8px 0 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 3px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-column-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.kanban-column-count {
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.kanban-column-content {
+  background-color: #f3f4f6;
+  border-radius: 0 0 8px 8px;
+  padding: 1rem;
+  flex: 1;
+  min-height: 400px;
+  transition: background-color 0.2s ease;
+}
+
+.kanban-column-content:hover {
+  background-color: #e5e7eb;
+}
+
+.kanban-column-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.kanban-column-empty p {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Drag and Drop states */
+.kanban-column-content.drag-over {
+  background-color: #dbeafe;
+  border: 2px dashed #3b82f6;
+}
+
+@media (max-width: 767px) {
+  .kanban-column {
+    min-height: 300px;
+  }
+
+  .kanban-column-content {
+    min-height: 250px;
+  }
+}
