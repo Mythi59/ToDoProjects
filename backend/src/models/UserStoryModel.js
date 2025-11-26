@@ -3,7 +3,8 @@ import DatabaseClient from "../config/DatabaseClient.js";
 
 class UserStoryModel {
   async create(userStoryData) {
-    const collection = DatabaseClient.db.collection("UserStory");
+    const db = await DatabaseClient.getDB();
+    const collectionUserStory = db.collection("UserStory");
 
     const newUserStory = {
       title: userStoryData.title,
@@ -14,29 +15,33 @@ class UserStoryModel {
       createdAt: new Date(),
     };
 
-    return await collection.insertOne(newUserStory);
+    return await collectionUserStory.insertOne(newUserStory);
   }
 
   async getAll() {
-    const collection = DatabaseClient.db.collection("UserStory");
-    return await collection.find({}).toArray();
+    const db = await DatabaseClient.getDB();
+    const collectionUserStory = db.collection("UserStory");
+    return await collectionUserStory.find({}).toArray();
   }
 
   async getById(id) {
-    const collection = DatabaseClient.db.collection("UserStory");
-    return await collection.findOne({ _id: new ObjectId(id) });
+    const db = await DatabaseClient.getDB();
+    const collectionUserStory = db.collection("UserStory");
+    return await collectionUserStory.findOne({ _id: new ObjectId(id) });
   }
 
   async getByProjectId(projectId) {
-    const collection = DatabaseClient.db.collection("UserStory");
-    return await collection
+    const db = await DatabaseClient.getDB();
+    const collectionUserStory = db.collection("UserStory");
+    return await collectionUserStory
       .find({ project: new ObjectId(projectId) })
       .toArray();
   }
 
   async update(id, userStoryData) {
-    const collection = DatabaseClient.db.collection("UserStory");
-    return await collection.updateOne(
+    const db = await DatabaseClient.getDB();
+    const collectionUserStory = db.collection("UserStory");
+    return await collectionUserStory.updateOne(
       { _id: new ObjectId(id) },
       { $set: userStoryData }
     );

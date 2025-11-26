@@ -4,7 +4,8 @@ import { TICKET_STATUS } from "../config/Constants.js";
 
 class TicketModel {
   async create(ticketData) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
 
     const newTicket = {
       title: ticketData.title,
@@ -21,22 +22,26 @@ class TicketModel {
   }
 
   async getAll() {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.find({}).toArray();
   }
 
   async getById(id) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.findOne({ _id: new ObjectId(id) });
   }
 
   async getByStatus(status) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.find({ status }).toArray();
   }
 
   async update(id, ticketData) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.updateOne(
       {
         _id: new ObjectId(id),
@@ -46,7 +51,8 @@ class TicketModel {
   }
 
   async addComments(id, observationData) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -63,7 +69,8 @@ class TicketModel {
   }
 
   async updateStatus(id, status) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket.updateOne(
       { _id: new ObjectId(id) },
       { $set: { status, updateAt: new Date() } }
@@ -71,7 +78,8 @@ class TicketModel {
   }
 
   async getTicketHistory(userId) {
-    const collectionTicket = DatabaseClient.db.collection("Ticket");
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
     return await collectionTicket
       .find({ createdBy: new ObjectId(userId) })
       .sort({ createdAt: -1 })
@@ -79,8 +87,9 @@ class TicketModel {
   }
 
   async getByUserStoryId(userStoryId) {
-    const collection = DatabaseClient.db.collection("Ticket");
-    return await collection
+    const db = await DatabaseClient.getDB();
+    const collectionTicket = db.collection("Ticket");
+    return await collectionTicket
       .find({ userStory: new ObjectId(userStoryId) })
       .toArray();
   }

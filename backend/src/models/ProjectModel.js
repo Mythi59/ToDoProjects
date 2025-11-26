@@ -3,7 +3,8 @@ import DatabaseClient from "../config/DatabaseClient.js";
 
 class ProjectModel {
   async create(projectData) {
-    const collection = DatabaseClient.db.collection("Project");
+    const db = await DatabaseClient.getDB();
+    const collectionProject = db.collection("Project");
 
     const newProject = {
       name: projectData.name,
@@ -12,29 +13,33 @@ class ProjectModel {
       createdAt: new Date(),
     };
 
-    return await collection.insertOne(newProject);
+    return await collectionProject.insertOne(newProject);
   }
 
   async getAll() {
-    const collection = DatabaseClient.db.collection("Project");
-    return await collection.find({}).toArray();
+    const db = await DatabaseClient.getDB();
+    const collectionProject = db.collection("Project");
+    return await collectionProject.find({}).toArray();
   }
 
   async getById(id) {
-    const collection = DatabaseClient.db.collection("Project");
-    return await collection.findOne({ _id: new ObjectId(id) });
+    const db = await DatabaseClient.getDB();
+    const collectionProject = db.collection("Project");
+    return await collectionProject.findOne({ _id: new ObjectId(id) });
   }
 
   async getByCompanyId(companyId) {
-    const collection = DatabaseClient.db.collection("Project");
+    const db = await DatabaseClient.getDB();
+    const collectionProject = db.collection("Project");
     return await collection
       .find({ company: new ObjectId(companyId) })
       .toArray();
   }
 
   async update(id, projectData) {
-    const collection = DatabaseClient.db.collection("Project");
-    return await collection.updateOne(
+    const db = await DatabaseClient.getDB();
+    const collectionProject = db.collection("Project");
+    return await collectionProject.updateOne(
       { _id: new ObjectId(id) },
       { $set: projectData }
     );
