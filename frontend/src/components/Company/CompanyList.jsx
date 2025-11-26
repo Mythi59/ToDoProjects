@@ -1,53 +1,92 @@
 import { useState, useEffect } from "react";
 import "./CompanyList.css";
 import Navbar from "../Layouts/Navbar";
+import CompanyForm from "./CompanyForm";
 import { companiesAPI, projectsAPI } from "../../api/Client.js";
 
 const CompanyList = ({ onViewChange }) => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
+
+  const fetchCompanies = async () => {
+    try {
+      setLoading(true);
+      const response = await companiesAPI.getAll();
+      const companiesWithProjects = await Promise.all(
+        response.body.map(async (company) => {
+          try {
+            const projectsResponse = await projectsAPI.getByProject(
+              company._id
+            );
+            return {
+              ...company,
+              id: company._id,
+              projectsCount: projectsResponse.body?.length || 0,
+            };
+          } catch (error) {
+            return {
+              ...company,
+              id: company._id,
+              projectsCount: 0,
+              error,
+            };
+          }
+        })
+      );
+
+      setCompanies(companiesWithProjects);
+    } catch (error) {
+      console.error("Error al obtener las compañías:", error);
+      alert("Error al cargar las compañías");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        setLoading(true);
-        const response = await companiesAPI.getAll();
-        const companiesWithProjects = await Promise.all(
-          response.body.map(async (company) => {
-            try {
-              const projectsResponse = await projectsAPI.getByProject(
-                company._id
-              );
-              return {
-                ...company,
-                id: company._id,
-                projectsCount: projectsResponse.body?.length || 0,
-              };
-            } catch (error) {
-              return {
-                ...company,
-                id: company._id,
-                projectsCount: 0,
-                error,
-              };
-            }
-          })
-        );
-
-        setCompanies(companiesWithProjects);
-      } catch (error) {
-        console.error("Error al obtener las compañías:", error);
-        alert("Error al cargar las compañías");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCompanies();
   }, []);
 
   const handleCompanyClick = (company) => {
     onViewChange("projects", { company });
+  };
+
+  const handleCreateClick = () => {
+    setEditingCompany(null);
+    setShowForm(true);
+  };
+
+  const handleEditClick = (e, company) => {
+    e.stopPropagation();
+    setEditingCompany(company);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingCompany(null);
+  };
+
+  const handleSaveCompany = async (formData) => {
+    try {
+      if (editingCompany) {
+        // Actualizar compañía existente
+        await companiesAPI.update(editingCompany.id, formData);
+        alert("Compañía actualizada exitosamente");
+      } else {
+        // Crear nueva compañía
+        await companiesAPI.create(formData);
+        alert("Compañía creada exitosamente");
+      }
+
+      handleCloseForm();
+      fetchCompanies();
+    } catch (error) {
+      console.error("Error al guardar compañía:", error);
+      alert("Error al guardar la compañía");
+    }
   };
 
   if (loading) {
@@ -69,10 +108,19 @@ const CompanyList = ({ onViewChange }) => {
 
       <div className="container">
         <div className="company-header">
-          <h2 className="company-title">Selecciona una Compañía</h2>
-          <p className="company-subtitle">
-            Elige la compañía para ver sus proyectos
-          </p>
+          <div>
+            <h2 className="company-title">Selecciona una Compañía</h2>
+            <p className="company-subtitle">
+              Elige la compañía para ver sus proyectos
+            </p>
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={handleCreateClick}
+            style={{ marginLeft: "auto" }}
+          >
+            + Nueva Compañía
+          </button>
         </div>
 
         {companies.length === 0 ? (
@@ -104,10 +152,19 @@ const CompanyList = ({ onViewChange }) => {
                       <polyline points="9 22 9 12 15 12 15 22"></polyline>
                     </svg>
                   </div>
-                  <span className="badge badge-blue">
-                    {company.projectsCount} proyecto
-                    {company.projectsCount !== 1 ? "s" : ""}
-                  </span>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <span className="badge badge-blue">
+                      {company.projectsCount} proyecto
+                      {company.projectsCount !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      className="btn btn-secondary"
+                      style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
+                      onClick={(e) => handleEditClick(e, company)}
+                    >
+                      Editar
+                    </button>
+                  </div>
                 </div>
                 <h3 className="company-name">{company.name}</h3>
                 <p className="company-action">Ver proyectos →</p>
@@ -116,6 +173,14 @@ const CompanyList = ({ onViewChange }) => {
           </div>
         )}
       </div>
+
+      {showForm && (
+        <CompanyForm
+          company={editingCompany}
+          onClose={handleCloseForm}
+          onSave={handleSaveCompany}
+        />
+      )}
     </div>
   );
 };

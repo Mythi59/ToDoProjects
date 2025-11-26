@@ -5,6 +5,10 @@
 
 .company-header {
   padding: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
 }
 
 .company-title {
@@ -80,4 +84,14 @@
 .company-action {
   color: #6b7280;
   font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .company-header {
+    flex-direction: column;
+  }
+
+  .company-header button {
+    width: 100%;
+  }
 }

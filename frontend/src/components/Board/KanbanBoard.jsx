@@ -3,6 +3,7 @@ import "./KanbanBoard.css";
 import Navbar from "../Layouts/Navbar";
 import TicketForm from "../Tickets/TicketForm";
 import TicketCard from "../Tickets/TicketCard";
+import UserStoryForm from "../UserStories/UserStoryForm";
 import { ticketsAPI, userStoriesAPI } from "../../api/Client";
 
 const KanbanBoard = ({ company, project, onViewChange }) => {
@@ -13,67 +14,68 @@ const KanbanBoard = ({ company, project, onViewChange }) => {
     finished: [],
   });
   const [loading, setLoading] = useState(true);
+  const [showUserStoryForm, setShowUserStoryForm] = useState(false);
+
+  const fetchTicketsAndStories = async () => {
+    try {
+      setLoading(true);
+
+      // Obtener historias de usuario del proyecto
+      const userStoriesResponse = await userStoriesAPI.getByProject(
+        project._id || project.id
+      );
+      const userStories = userStoriesResponse.body || [];
+
+      // Obtener todos los tickets
+      const ticketsResponse = await ticketsAPI.getAll();
+      const allTickets = ticketsResponse.body || [];
+
+      // Filtrar tickets que pertenecen a las historias de usuario de este proyecto
+      const userStoryIds = userStories.map((us) => us._id);
+      const projectTickets = allTickets.filter((ticket) =>
+        userStoryIds.includes(ticket.userStory)
+      );
+
+      // Organizar tickets por estado
+      const organizedTickets = {
+        active: projectTickets
+          .filter((t) => t.status === "active")
+          .map((t) => ({
+            ...t,
+            id: t._id,
+            userStoryTitle:
+              userStories.find((us) => us._id === t.userStory)?.title ||
+              "Sin US",
+          })),
+        in_progress: projectTickets
+          .filter((t) => t.status === "in_progress")
+          .map((t) => ({
+            ...t,
+            id: t._id,
+            userStoryTitle:
+              userStories.find((us) => us._id === t.userStory)?.title ||
+              "Sin US",
+          })),
+        finished: projectTickets
+          .filter((t) => t.status === "finished")
+          .map((t) => ({
+            ...t,
+            id: t._id,
+            userStoryTitle:
+              userStories.find((us) => us._id === t.userStory)?.title ||
+              "Sin US",
+          })),
+      };
+
+      setTickets(organizedTickets);
+    } catch (error) {
+      console.error("Error al consultar tickets:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTicketsAndStories = async () => {
-      try {
-        setLoading(true);
-
-        // Obtener historias de usuario del proyecto
-        const userStoriesResponse = await userStoriesAPI.getByProject(
-          project._id || project.id
-        );
-        const userStories = userStoriesResponse.body || [];
-
-        // Obtener todos los tickets
-        const ticketsResponse = await ticketsAPI.getAll();
-        const allTickets = ticketsResponse.body || [];
-
-        // Filtrar tickets que pertenecen a las historias de usuario de este proyecto
-        const userStoryIds = userStories.map((us) => us._id);
-        const projectTickets = allTickets.filter((ticket) =>
-          userStoryIds.includes(ticket.userStory)
-        );
-
-        // Organizar tickets por estado
-        const organizedTickets = {
-          active: projectTickets
-            .filter((t) => t.status === "active")
-            .map((t) => ({
-              ...t,
-              id: t._id,
-              userStoryTitle:
-                userStories.find((us) => us._id === t.userStory)?.title ||
-                "Sin US",
-            })),
-          in_progress: projectTickets
-            .filter((t) => t.status === "in_progress")
-            .map((t) => ({
-              ...t,
-              id: t._id,
-              userStoryTitle:
-                userStories.find((us) => us._id === t.userStory)?.title ||
-                "Sin US",
-            })),
-          finished: projectTickets
-            .filter((t) => t.status === "finished")
-            .map((t) => ({
-              ...t,
-              id: t._id,
-              userStoryTitle:
-                userStories.find((us) => us._id === t.userStory)?.title ||
-                "Sin US",
-            })),
-        };
-
-        setTickets(organizedTickets);
-      } catch (error) {
-        console.error("Error al consultar tickets:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (project) {
       fetchTicketsAndStories();
     }
@@ -132,23 +134,23 @@ const KanbanBoard = ({ company, project, onViewChange }) => {
       // Crear ticket en la API
       const response = await ticketsAPI.create(newTicket);
 
-      // Obtener el ticket creado con su ID
-      const createdTicket = {
-        ...newTicket,
-        id: response.body.id,
-        _id: response.body.id,
-        status: "active",
-        comments: [],
-      };
-
-      // Actualizar estado local
-      setTickets((prev) => ({
-        ...prev,
-        active: [...prev.active, createdTicket],
-      }));
+      // Actualizar la vista
+      fetchTicketsAndStories();
     } catch (error) {
       console.error("Error al crear ticket:", error);
       alert("Error al crear el ticket");
+    }
+  };
+
+  const handleUserStoryCreated = async (userStoryData) => {
+    try {
+      await userStoriesAPI.create(userStoryData);
+      alert("Historia de usuario creada exitosamente");
+      setShowUserStoryForm(false);
+      fetchTicketsAndStories();
+    } catch (error) {
+      console.error("Error al crear historia de usuario:", error);
+      alert("Error al crear la historia de usuario");
     }
   };
 
@@ -180,6 +182,23 @@ const KanbanBoard = ({ company, project, onViewChange }) => {
         showBack={true}
         onBack={() => onViewChange("projects", { company })}
       />
+
+      <div
+        style={{
+          background: "white",
+          borderBottom: "1px solid #e5e7eb",
+          padding: "1rem 0",
+        }}
+      >
+        <div className="container" style={{ display: "flex", gap: "1rem" }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowUserStoryForm(true)}
+          >
+            + Nueva Historia de Usuario
+          </button>
+        </div>
+      </div>
 
       <TicketForm
         projectId={project?.id || project?._id}
@@ -226,6 +245,14 @@ const KanbanBoard = ({ company, project, onViewChange }) => {
           </div>
         </div>
       </div>
+
+      {showUserStoryForm && (
+        <UserStoryForm
+          projectId={project._id || project.id}
+          onClose={() => setShowUserStoryForm(false)}
+          onSave={handleUserStoryCreated}
+        />
+      )}
     </div>
   );
 };
