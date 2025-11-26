@@ -10,29 +10,31 @@ const ProjectList = ({ company, onViewChange }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await projectsAPI.getByProject(
+        company._id || company.id
+      );
+
+      setProjects(
+        response.body.map((project) => ({
+          ...project,
+          id: project._id,
+        }))
+      );
+    } catch (error) {
+      console.error("Error al obtener los proyectos:", error);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await projectsAPI.getByProject(
-          company._id || company.id
-        );
-
-        setProjects(
-          response.body.map((project) => ({
-            ...project,
-            id: project._id,
-          }))
-        );
-      } catch (error) {
-        console.error("Error al obtener los proyectos:", error);
-        setProjects([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+    if (company) {
+      fetchProjects();
+    }
   }, [company]);
 
   const handleProjectClick = (project) => {
@@ -58,35 +60,16 @@ const ProjectList = ({ company, onViewChange }) => {
   const handleSaveProject = async (formData) => {
     try {
       if (editingProject) {
-        // Actualizar proyecto existente
         await projectsAPI.update(editingProject.id, formData);
         alert("Proyecto actualizado exitosamente");
       } else {
-        // Crear nuevo proyecto
         await projectsAPI.create(formData);
         alert("Proyecto creado exitosamente");
       }
 
       handleCloseForm();
-
-      try {
-        setLoading(true);
-        const response = await projectsAPI.getByProject(
-          company._id || company.id
-        );
-
-        setProjects(
-          response.body.map((project) => ({
-            ...project,
-            id: project._id,
-          }))
-        );
-      } catch (error) {
-        console.error("Error al obtener los proyectos:", error);
-        setProjects([]);
-      } finally {
-        setLoading(false);
-      }
+      // ✅ Simplificar: solo llamar fetchProjects una vez
+      fetchProjects();
     } catch (error) {
       console.error("Error al guardar proyecto:", error);
       alert("Error al guardar el proyecto");
