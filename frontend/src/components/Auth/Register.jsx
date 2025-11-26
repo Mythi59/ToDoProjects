@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import "./Register.css";
+import API from "../../api/Client.js";
 
-const Register = () => {
+const Register = ({ onViewChange }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -9,27 +11,37 @@ const Register = () => {
   });
 
   const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    try {
-      const fetchCompanies = fetch("")
-        .then((response) => {
-          response.json();
-        })
-        .catch((error) => {
-          console.error("Error fetching companies:", error);
-        });
+    const fetchCompanies = async () => {
+      try {
+        setLoading(true);
+        const response = await API.companies.getAll();
+        setCompanies(response.body || []);
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+        setError("Error al cargar las compañías");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setCompanies(fetchCompanies);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-    }
+    fetchCompanies();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`Register: ${formData}`);
-    onViewChange("companies");
+    try {
+      const response = await API.auth.register(formData);
+      console.log("Registro exitoso:", response);
+      alert("Usuario registrado exitosamente");
+      onViewChange("login");
+    } catch (error) {
+      console.error("Error en registro:", error);
+      alert(error.message || "Error al registrarse");
+    }
   };
 
   const handleChange = (e) => {
@@ -39,13 +51,27 @@ const Register = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="register-container">
+        <div className="register-card">
+          <p>Cargando compañías...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-          <h1 className="register-title">Register</h1>
-          <p className="register-subtitle">You're not register</p>
+          <h1 className="register-title">Registro</h1>
+          <p className="register-subtitle">Crea tu cuenta</p>
         </div>
+
+        {error && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+        )}
 
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-group">
@@ -110,7 +136,7 @@ const Register = () => {
             >
               <option value="">Selecciona una compañía</option>
               {companies.map((company) => (
-                <option key={company.id} value={company.id}>
+                <option key={company._id} value={company._id}>
                   {company.name}
                 </option>
               ))}
