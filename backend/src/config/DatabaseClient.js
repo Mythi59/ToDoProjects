@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { MongoClient } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
 const USER_DB = process.env.USER_DB;
 const HOST_DB = process.env.HOST_DB;
