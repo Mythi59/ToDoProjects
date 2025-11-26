@@ -1,64 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./KanbanBoard.css";
 import Navbar from "../Layouts/Navbar";
 import TicketForm from "../Tickets/TicketForm";
 import TicketCard from "../Tickets/TicketCard";
+import { ticketsAPI } from "../../api/Client";
 
 const KanbanBoard = ({ company, project, onViewChange }) => {
   const [draggedTicket, setDraggedTicket] = useState(null);
-  const [tickets, setTickets] = useState({
-    active: [
-      {
-        id: 1,
-        title: "Implementar sistema de login",
-        userStory: 1,
-        comments: 2,
-        priority: "high",
-        description: "Crear formulario de login con validaciones",
-      },
-      {
-        id: 2,
-        title: "Crear dashboard principal",
-        userStory: 1,
-        comments: 0,
-        priority: "medium",
-        description: "Diseñar e implementar el dashboard",
-      },
-    ],
-    in_progress: [
-      {
-        id: 3,
-        title: "Diseño de reportes",
-        userStory: 2,
-        comments: 5,
-        priority: "high",
-        description: "Crear mockups de reportes",
-      },
-      {
-        id: 4,
-        title: "API de estadísticas",
-        userStory: 2,
-        comments: 3,
-        priority: "medium",
-      },
-    ],
-    finished: [
-      {
-        id: 5,
-        title: "Setup inicial del proyecto",
-        userStory: 1,
-        comments: 1,
-        priority: "low",
-      },
-      {
-        id: 6,
-        title: "Configuración de base de datos",
-        userStory: 1,
-        comments: 2,
-        priority: "low",
-      },
-    ],
-  });
+  const [tickets, setTickets] = useState([]);
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await ticketsAPI.getAll();
+        setTickets(response.body);
+      } catch (error) {
+        console.error("Error al consultar tickets front: ", error);
+      }
+    };
+
+    fetchTickets();
+  }, []);
 
   const columns = [
     { id: "active", title: "Activo", color: "#3b82f6" },

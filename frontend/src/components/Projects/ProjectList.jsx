@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
 import "./ProjectList.css";
 import Navbar from "../Layouts/Navbar";
+import { projectsAPI } from "../../api/Client";
 
 const ProjectList = ({ company, onViewChange }) => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    setProjects;
+    const fetchProjects = async () => {
+      try {
+        const response = await projectsAPI.getAll();
+        setProjects(response.body);
+      } catch (error) {
+        console.error("Error al obtener los proyectos front: ", error);
+      }
+    };
+
+    fetchProjects();
   }, [company]);
 
   const handleProjectClick = (project) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./TicketForm.css";
+import { userStoriesAPI } from "../../api/Client";
 
 const TicketForm = ({ projectId, onTicketCreated }) => {
   const [formData, setFormData] = useState({
@@ -12,12 +13,16 @@ const TicketForm = ({ projectId, onTicketCreated }) => {
   const [userStories, setUserStories] = useState([]);
 
   useEffect(() => {
-    // TODO: Obtener historias de usuario desde la API
-    setUserStories([
-      { id: 1, title: "US1: Gestión de Usuarios" },
-      { id: 2, title: "US2: Reportes y Estadísticas" },
-      { id: 3, title: "US3: Notificaciones" },
-    ]);
+    const fetchTickets = async () => {
+      try {
+        const response = await userStoriesAPI.getAll();
+        setUserStories(response.body);
+      } catch (error) {
+        console.error("Error al consultar los tickets front: ", error);
+      }
+    };
+
+    fetchTickets();
   }, [projectId]);
 
   const handleSubmit = (e) => {
