@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../Company/CompanyForm.css"; // Reutilizamos los estilos
 
 const ProjectForm = ({ project, companyId, onClose, onSave }) => {
@@ -7,12 +7,21 @@ const ProjectForm = ({ project, companyId, onClose, onSave }) => {
     description: "",
   });
 
-  if (project) {
-    setFormData({
-      name: project.name || "",
-      description: project.description || "",
-    });
-  }
+  // ✅ Corrección: useEffect para cargar datos cuando cambia project
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        name: project.name || "",
+        description: project.description || "",
+      });
+    } else {
+      // Reset form cuando no hay project (modo crear)
+      setFormData({
+        name: "",
+        description: "",
+      });
+    }
+  }, [project]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

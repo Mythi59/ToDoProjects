@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CompanyForm.css";
 
 const CompanyForm = ({ company, onClose, onSave }) => {
@@ -10,15 +10,27 @@ const CompanyForm = ({ company, onClose, onSave }) => {
     email: "",
   });
 
-  if (company) {
-    setFormData({
-      name: company.name || "",
-      nit: company.nit || "",
-      phone: company.phone || "",
-      address: company.address || "",
-      email: company.email || "",
-    });
-  }
+  // ✅ Corrección: useEffect para cargar datos cuando cambia company
+  useEffect(() => {
+    if (company) {
+      setFormData({
+        name: company.name || "",
+        nit: company.nit || "",
+        phone: company.phone || "",
+        address: company.address || "",
+        email: company.email || "",
+      });
+    } else {
+      // Reset form cuando no hay company (modo crear)
+      setFormData({
+        name: "",
+        nit: "",
+        phone: "",
+        address: "",
+        email: "",
+      });
+    }
+  }, [company]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
