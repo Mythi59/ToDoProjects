@@ -1,8 +1,9 @@
+import "dotenv/config";
 import bcrypt from "bcrypt";
 import DatabaseClient from "../config/DatabaseClient.js";
-import { SALT_ROUNDS } from "../config/Environment.js";
 import { ObjectId } from "mongodb";
 
+const SALT_ROUNDS = process.env.SALT_ROUNDS;
 class UserModel {
   async createUser(userData) {
     const collectionUser = DatabaseClient.db.collection("User");

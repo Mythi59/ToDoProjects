@@ -1,6 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { PORT } from "./config/Environment.js";
+
+const PORT = process.env.PORT || 3000;
 
 // import routes
 import routesCompany from "./routes/CompanyRoutes.js";
