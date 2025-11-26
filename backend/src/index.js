@@ -40,6 +40,7 @@ app.get("/", (req, res) => {
 
       <h3>/projects -> Project routes</h3>
       <ul>
+        <li>/projects -> Get all Projects</li>
         <li>/projects/company/:projectId -> Get Projects by Company ID</li>
         <li>/projects/:id -> Get Project by ID</li>
         <li>/projects (POST) -> Create a Project</li>
@@ -48,6 +49,7 @@ app.get("/", (req, res) => {
 
       <h3>/tickets -> Ticket routes</h3>
       <ul>
+        <li>/tickets -> Get all Tickets</li>
         <li>/tickets/project/:projectId -> Get Tickets by Project ID</li>
         <li>/tickets/:id -> Get Ticket by ID</li>
         <li>/tickets (POST) -> Create a Ticket</li>
@@ -56,6 +58,7 @@ app.get("/", (req, res) => {
 
       <h3>/user-stories -> User Stories routes</h3>
       <ul>
+        <li>/user-stories -> Get all User Stories</li>
         <li>/user-stories/project/:projectId -> Get User Stories by Project ID</li>
         <li>/user-stories/:id -> Get User Story by ID</li>
         <li>/user-stories (POST) -> Create a User Story</li>
