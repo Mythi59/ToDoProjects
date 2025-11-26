@@ -31,7 +31,7 @@ class ProjectModel {
   async getByCompanyId(companyId) {
     const db = await DatabaseClient.getDB();
     const collectionProject = db.collection("Project");
-    return await collection
+    return await collectionProject
       .find({ company: new ObjectId(companyId) })
       .toArray();
   }
