@@ -7,7 +7,7 @@ import KanbanBoard from "./components/Board/KanbanBoard";
 import { useState } from "react";
 
 const App = () => {
-  const [currentView, setCurrentView] = useState("login");
+  const [currentView, setCurrentView] = useState("board");
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -19,10 +19,10 @@ const App = () => {
 
   return (
     <div className="app">
-      {currentView === "login" && <Login onViewChange={handleViewChange} />}
+      {/* {currentView === "login" && <Login onViewChange={handleViewChange} />}
       {currentView === "register" && (
         <Register onViewChange={handleViewChange} />
-      )}
+      )} */}
       {currentView === "companies" && (
         <CompanyList onViewChange={handleViewChange} />
       )}
