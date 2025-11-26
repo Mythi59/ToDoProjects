@@ -1,5 +1,9 @@
+import "dotenv/config";
 import { MongoClient } from "mongodb";
-import { HOST_DB, PASSWORD_DB, USER_DB } from "./Environment.js";
+
+const USER_DB = process.env.USER_DB;
+const HOST_DB = process.env.HOST_DB;
+const PASSWORD_DB = process.env.PASSWORD_DB;
 
 class DbClient {
   constructor() {
