@@ -27,6 +27,12 @@ const TicketCard = ({ ticket, onDragStart, status }) => {
     }
   };
 
+  const getCommentsCount = () => {
+    if (!ticket.comments) return 0;
+    if (Array.isArray(ticket.comments)) return ticket.comments.length;
+    return 0;
+  };
+
   return (
     <div
       className="ticket-card"
@@ -59,34 +65,34 @@ const TicketCard = ({ ticket, onDragStart, status }) => {
       )}
 
       <div className="ticket-card-footer">
-        <span className={`badge ${getPriorityClass(ticket.priority)}`}>
-          {getPriorityText(ticket.priority)}
-        </span>
+        {ticket.priority && (
+          <span className={`badge ${getPriorityClass(ticket.priority)}`}>
+            {getPriorityText(ticket.priority)}
+          </span>
+        )}
 
         <div className="ticket-card-meta">
-          {ticket.comments !== undefined && (
-            <span className="ticket-card-comments">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <span>{ticket.comments}</span>
-            </span>
-          )}
+          <span className="ticket-card-comments">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>{getCommentsCount()}</span>
+          </span>
         </div>
       </div>
 
-      {ticket.userStory && (
-        <div className="ticket-card-user-story">US{ticket.userStory}</div>
+      {ticket.userStoryTitle && (
+        <div className="ticket-card-user-story">{ticket.userStoryTitle}</div>
       )}
     </div>
   );

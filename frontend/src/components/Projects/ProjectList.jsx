@@ -5,23 +5,56 @@ import { projectsAPI } from "../../api/Client";
 
 const ProjectList = ({ company, onViewChange }) => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await projectsAPI.getAll();
-        setProjects(response.body);
+        setLoading(true);
+        const response = await projectsAPI.getByProject(
+          company._id || company.id
+        );
+
+        setProjects(
+          response.body.map((project) => ({
+            ...project,
+            id: project._id,
+          }))
+        );
       } catch (error) {
-        console.error("Error al obtener los proyectos front: ", error);
+        console.error("Error al obtener los proyectos:", error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProjects();
+    if (company) {
+      fetchProjects();
+    }
   }, [company]);
 
   const handleProjectClick = (project) => {
-    onViewChange("board", { project });
+    onViewChange("board", { company, project });
   };
+
+  if (loading) {
+    return (
+      <div className="project-view">
+        <Navbar
+          onViewChange={onViewChange}
+          title={company?.name}
+          showBack={true}
+          onBack={() => onViewChange("companies")}
+        />
+        <div className="container">
+          <div className="project-header">
+            <h2 className="project-title">Cargando proyectos...</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="project-view">
@@ -64,11 +97,21 @@ const ProjectList = ({ company, onViewChange }) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                   </svg>
                 </div>
                 <h3 className="project-name">{project.name}</h3>
+                {project.description && (
+                  <p
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#6b7280",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    {project.description}
+                  </p>
+                )}
                 <p className="project-action">Ver tablero →</p>
               </div>
             ))}

@@ -1,21 +1,26 @@
-const API_BASE_URL = "https://to-do-projects-backend.vercel.app"; // ! change
+const API_BASE_URL = "https://to-do-projects-backend.vercel.app";
 
 const request = async (url, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error(data.message || "API request failed");
+    if (!response.ok) {
+      throw new Error(data.error || data.message || "API request failed");
+    }
+
+    return data;
+  } catch (error) {
+    console.error(`API Error (${url}):`, error);
+    throw error;
   }
-
-  return data;
 };
 
 export const authAPI = {
@@ -40,6 +45,11 @@ export const companiesAPI = {
       method: "POST",
       body: JSON.stringify(companyData),
     }),
+  update: (id, companyData) =>
+    request(`/company/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(companyData),
+    }),
 };
 
 export const projectsAPI = {
@@ -51,10 +61,15 @@ export const projectsAPI = {
       method: "POST",
       body: JSON.stringify(projectData),
     }),
+  update: (id, projectData) =>
+    request(`/projects/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(projectData),
+    }),
 };
 
 export const userStoriesAPI = {
-  getAll: () => request("user-stories"),
+  getAll: () => request("/user-stories"),
   getByProject: (projectId) => request(`/user-stories/project/${projectId}`),
   getById: (id) => request(`/user-stories/${id}`),
   create: (userStoryData) =>
@@ -75,6 +90,7 @@ export const ticketsAPI = {
     request(`/tickets/user-story/${userStoryId}`),
   getByStatus: (status) => request(`/tickets/status/${status}`),
   getHistory: () => request("/tickets/history"),
+  getById: (id) => request(`/tickets/${id}`),
   create: (ticketData) =>
     request("/tickets", {
       method: "POST",

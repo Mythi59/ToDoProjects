@@ -11,24 +11,42 @@ const TicketForm = ({ projectId, onTicketCreated }) => {
   });
 
   const [userStories, setUserStories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTickets = async () => {
+    const fetchUserStories = async () => {
       try {
-        const response = await userStoriesAPI.getAll();
-        setUserStories(response.body);
+        setLoading(true);
+        const response = await userStoriesAPI.getByProject(projectId);
+        setUserStories(response.body || []);
       } catch (error) {
-        console.error("Error al consultar los tickets front: ", error);
+        console.error("Error al consultar las historias de usuario:", error);
+        setUserStories([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchTickets();
+    if (projectId) {
+      fetchUserStories();
+    }
   }, [projectId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Enviar a la API
-    console.log("Crear ticket:", formData);
+
+    if (!formData.userStoryId) {
+      alert("Debes seleccionar una historia de usuario");
+      return;
+    }
+
+    const ticketData = {
+      title: formData.title,
+      description: formData.description,
+      userStoryId: formData.userStoryId,
+      priority: formData.priority,
+      comments: [],
+    };
 
     // Limpiar formulario
     setFormData({
@@ -39,7 +57,7 @@ const TicketForm = ({ projectId, onTicketCreated }) => {
     });
 
     if (onTicketCreated) {
-      onTicketCreated(formData);
+      onTicketCreated(ticketData);
     }
   };
 
@@ -49,6 +67,28 @@ const TicketForm = ({ projectId, onTicketCreated }) => {
       [e.target.name]: e.target.value,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="ticket-form-container">
+        <div className="container">
+          <p style={{ padding: "1rem" }}>Cargando historias de usuario...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (userStories.length === 0) {
+    return (
+      <div className="ticket-form-container">
+        <div className="container">
+          <p style={{ padding: "1rem", color: "#6b7280" }}>
+            No hay historias de usuario disponibles en este proyecto.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ticket-form-container">
@@ -87,7 +127,7 @@ const TicketForm = ({ projectId, onTicketCreated }) => {
             >
               <option value="">Seleccionar Historia de Usuario</option>
               {userStories.map((us) => (
-                <option key={us.id} value={us.id}>
+                <option key={us._id} value={us._id}>
                   {us.title}
                 </option>
               ))}
