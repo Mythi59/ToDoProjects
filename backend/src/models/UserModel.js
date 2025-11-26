@@ -6,7 +6,8 @@ import { ObjectId } from "mongodb";
 const SALT_ROUNDS = process.env.SALT_ROUNDS;
 class UserModel {
   async createUser(userData) {
-    const collectionUser = DatabaseClient.db.collection("User");
+    const db = await DatabaseClient.getDB();
+    const collectionUser = db.collection("User");
 
     const hashedPassword = bcrypt.hashSync(userData.password, SALT_ROUNDS); // salt
 
@@ -23,7 +24,8 @@ class UserModel {
   }
 
   async findById(id) {
-    const collectionUser = DatabaseClient.db.collection("User");
+    const db = await DatabaseClient.getDB();
+    const collectionUser = db.collection("User");
     return await collectionUser.findOne({ _id: new ObjectId(id) });
   }
 
@@ -32,12 +34,14 @@ class UserModel {
   }
 
   async findByEmail(email) {
-    const collectionUser = DatabaseClient.db.collection("User");
+    const db = await DatabaseClient.getDB();
+    const collectionUser = db.collection("User");
     return await collectionUser.findOne({ email });
   }
 
   async getUsersByCompany(companyId) {
-    const collectionUser = DatabaseClient.db.collection("User");
+    const db = await DatabaseClient.getDB();
+    const collectionUser = db.collection("User");
     return await collectionUser
       .find({ company: new ObjectId(companyId) })
       .toArray();

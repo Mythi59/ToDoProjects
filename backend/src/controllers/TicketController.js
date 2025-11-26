@@ -1,5 +1,4 @@
 import TicketModel from "../models/TicketModel.js";
-import UserStoryModel from "../models/UserStoryModel.js";
 import { ERROR_MESSAGES, TICKET_STATUS } from "../config/Constants.js";
 
 class TickerController {
@@ -47,7 +46,7 @@ class TickerController {
   async getAllTicketsByUserStory(request, response) {
     try {
       const { userStoryId } = request.params;
-      const tickets = await UserStoryModel.getByUserStoryId(userStoryId);
+      const tickets = await TicketModel.getByUserStoryId(userStoryId);
 
       return response.status(200).json({
         message: "Lista de tickets por User Story",
