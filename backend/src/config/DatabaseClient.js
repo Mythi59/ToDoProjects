@@ -8,7 +8,12 @@ const PASSWORD_DB = process.env.PASSWORD_DB;
 class DbClient {
   constructor() {
     const queryString = `mongodb+srv://${USER_DB}:${PASSWORD_DB}@${HOST_DB}/?retryWrites=true&w=majority`;
-    this.client = new MongoClient(queryString);
+    this.client = new MongoClient(queryString, {
+      tlsAllowInvalidCertificates: true,
+      tlsAllowInvalidHostnames: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
     this.db = null;
     this.connecting = null;
   }
