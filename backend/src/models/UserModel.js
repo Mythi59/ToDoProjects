@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import DatabaseClient from "../config/DatabaseClient.js";
 import { ObjectId } from "mongodb";
 
-const SALT_ROUNDS = process.env.SALT_ROUNDS;
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
 class UserModel {
   async createUser(userData) {
     const db = await DatabaseClient.getDB();
